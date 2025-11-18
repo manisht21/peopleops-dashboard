@@ -73,7 +73,8 @@ const Leaves = () => {
           status,
           review_notes,
           created_at,
-          profiles(name)
+          user_id,
+          profiles!leaves_user_id_fkey(name)
         `)
         .order("created_at", { ascending: false });
 
@@ -84,12 +85,16 @@ const Leaves = () => {
 
       const { data, error } = await query;
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching leaves:", error);
+        toast.error(`Failed to load leaves: ${error.message}`);
+        throw error;
+      }
 
       setLeaves((data as any) || []);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error fetching leaves:", error);
-      toast.error("Failed to load leaves");
+      toast.error(error?.message || "Failed to load leaves");
     } finally {
       setLoading(false);
     }
